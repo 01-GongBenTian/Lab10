@@ -13,12 +13,14 @@ public class Calculator : MonoBehaviour {
 	private string _op;
 
 	//Initialization
-	private void Start(){
+	private void Start()
+	{
 		ResetAll ();
 	}
 
 	//Reset fields and member variables
-	private void ResetAll(){
+	private void ResetAll()
+	{
 		ClearField();
 		_x = 0.0f;
 		_y = 0.0f;
@@ -26,19 +28,24 @@ public class Calculator : MonoBehaviour {
 	}
 
 	//Handle values coming from button clicks
-	public void SetInputValue(string s){
+	public void SetInputValue(string s)
+	{
 		//Clear fields if _input contains letters
-		if (_input.text.ToString ().Any (x => char.IsLetter (x))) {
+		if (_input.text.ToString().Any (x => char.IsLetter(x))) 
+		{
 			ResetAll();
 		}
 
 		//Handles button input values
-		switch (s) {
-				case "+":
-				case "-":
-				case "/":
-				case "*":
-				case "=":
+		switch (s) 
+		{
+			case "+":
+			case "-":
+			case "/":
+			case "*":
+			case "=":
+			case "√":
+			case "^":
 				Calculate(s);
 				break;
 			case "ce":
@@ -57,9 +64,20 @@ public class Calculator : MonoBehaviour {
 	} 
 
 	//Prepare values before the calculation
-	private void Calculate(string s){
+	private void Calculate(string s)
+	{
+		if (s == "√")
+		{
+			_x = Convert.ToSingle(_input.text);
+			_x = CalculatePair(_x, _y, "√");
+			ClearField();
+			_input.text = _x.ToString();
+			return;
+		}
+
 		//If result field is empty
-		if (_result.text == "" && s != "=") {
+		if (_result.text == "" && s != "=") 
+		{
 			_x = Convert.ToSingle(_input.text);
 			_op = s;
 			_result.text = _input.text + " " + s;
@@ -67,8 +85,31 @@ public class Calculator : MonoBehaviour {
 			return;
 		}
 
+		if(_op != "" && s != "=" && !char.IsLetter(s[0]))
+        {
+			if(_op == s)
+            {
+				return;
+            }
+			else
+            {
+				_op = s;
+				_result.text = _x + " " + s;
+				return;
+            }
+        }
+
+		if(s == "√")
+        {
+			_x = Convert.ToSingle(_input.text);
+			ClearField();
+			_input.text = Mathf.Sqrt(_x).ToString();
+			return;
+		}
+
 		//Handles division by 0
-		if(_op == "/" && _input.text == "0"){
+		if (_op == "/" && _input.text == "0" && s == "=")
+		{
 			ResetAll();
 			_input.text = "Cannot divide by zero";
 			return;
@@ -77,10 +118,13 @@ public class Calculator : MonoBehaviour {
 		//Calculates float result
 		_y = Convert.ToSingle(_input.text);
 
-		if(s == "="){
+		if(s == "=")
+		{
 			ClearField();
 			_input.text = CalculatePair(_x, _y, _op).ToString();
-		} else {
+		} 
+		else 
+		{
 			_x = Convert.ToSingle(CalculatePair(_x, _y, _op));
 			_result.text = _x.ToString() + " " + s;
 			_op = s;
@@ -105,23 +149,36 @@ public class Calculator : MonoBehaviour {
 			case "/":
 				result = x / y;
 				break;
+			case "√":
+				result = Mathf.Sqrt(x);
+				break;
+			case "^":
+				result = Mathf.Pow(x, y);
+				break;
 		}
 
 		return result;
 	}
 
 	//Add character input to input text string
-	private void AddCharacter(string s){
+	private void AddCharacter(string s)
+	{
 		//Add only one decimal point
-		if(s == "."){
-			if(!_input.text.ToString().Contains(".")){
+		if(s == ".")
+		{
+			if(!_input.text.ToString().Contains("."))
+			{
 				_input.text += s;
 			}
 		//Remove 0 in front of number
-		}else if(_input.text == "0"){
+		}
+		else if(_input.text == "0")
+		{
 			_input.text = s;
 		//Concatenate the input string
-		}else{
+		}
+		else
+		{
 			_input.text += s;
 		}
 	}
@@ -145,4 +202,10 @@ public class Calculator : MonoBehaviour {
 		_result.text = "";
 		_input.text = "0";
 	}
+
+	public void SquareRoot()
+    {
+		_x = System.Convert.ToSingle(_input.text);
+		_result.text = Mathf.Sqrt(_x).ToString();
+    }
 }
